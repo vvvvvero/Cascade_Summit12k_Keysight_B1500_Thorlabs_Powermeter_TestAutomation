@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "vcsel-wafer-automation"
+version = "1.0.0"
+description = "Cascade Summit 12000 AP + Keysight B1500 wafer automation GUI with per-site LIV measurement and rollover detection"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Veronica Gao Zhan" }
+]
+requires-python = ">=3.8"
+keywords = ["vcsel", "wafer", "automation", "cascade", "b1500", "rollover", "liv"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+]
+
+dependencies = [
+    "PyQt5>=5.15",
+    "matplotlib>=3.5",
+    "numpy>=1.21",
+    "pyvisa>=1.12",
+    "pyvisa-py>=0.5",
+    # b1500_powermeter_rollover — install from its own repository:
+    #   pip install -e ../b1500_powermeter_rollover
+    # or from GitHub:
+    #   pip install git+ https://github.com/vvvvvero/b1500_powermeter_LIV_rollover.git
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "pytest-qt>=4",
+]
+
+[project.scripts]
+wafer-automation = "wafer_automation.gui.main_window:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["wafer_automation*"]
+
+[tool.setuptools.package-data]
+"wafer_automation" = ["py.typed"]
