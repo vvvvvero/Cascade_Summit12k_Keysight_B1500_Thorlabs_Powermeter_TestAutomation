@@ -1,4 +1,5 @@
 # VCSEL Wafer Automation
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Automated wafer-level LIV (Light-Current-Voltage) measurement with per-site
 **optical rollover detection** for VCSEL arrays.
@@ -153,7 +154,7 @@ pytest tests/
 
 ## License
 
-© Veronica Gao ZHan
+MIT © Veronica Gao ZHan
 
 ---
 
