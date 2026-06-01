@@ -154,7 +154,7 @@ pytest tests/
 
 ## License
 
-MIT © Veronica Gao ZHan
+MIT
 
 ---
 
