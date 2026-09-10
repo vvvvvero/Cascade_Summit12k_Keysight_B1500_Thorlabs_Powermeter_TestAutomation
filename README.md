@@ -1,6 +1,37 @@
 # VCSEL Wafer Automation
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## Series Context
+
+This repository is part of the Veronica GaoZhan VCSEL Reliability Test Series.
+
+- Series ID: VGZ-VRLS
+- Track: Wafer-level mapping and automation
+- Position: W1 (mapping branch)
+- Protocol name: wafer_mapping_rollover
+- Author: Veronica Gao ZHan
+
+### Related Repositories
+
+- LIV rollover baseline engine: https://github.com/vvvvvero/b1500_powermeter_LIV_rollover
+- Step stress protocol: https://github.com/vvvvvero/Laser_Optical_Reliablity_Tests_1_Step_Stress
+- B1500 + Avantes synchronized spectra: https://github.com/vvvvvero/Keysight-B1500-Avantes-Spectrometer-Synchronized-Measurement
+
+### Standard Session Fields (Series V1)
+
+Wafer runs should map site-level measurements to the same session identifiers:
+
+- project_id
+- wafer_id
+- device_id
+- session_id
+- parent_session_id
+- protocol_name
+- protocol_version
+- schema_version
+
+Series data contract: [SERIES_V1_SCHEMA.md](SERIES_V1_SCHEMA.md)
+
 Automated wafer-level LIV (Light-Current-Voltage) measurement with per-site
 **optical rollover detection** for VCSEL arrays.
 
