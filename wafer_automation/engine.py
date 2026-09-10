@@ -19,7 +19,7 @@ import subprocess
 import sys
 import time
 from dataclasses import replace
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
@@ -310,6 +310,60 @@ class WaferAutomationEngine:
                 ])
         return str(path)
 
+    def _save_session_manifest(
+        self,
+        output_dir: Path,
+        run_start_ts: float,
+        run_end_ts: float,
+        total_sites: int,
+        summary_path: str,
+        run_error: str = "",
+    ) -> str:
+        """Write a run manifest aligned to the series V1 schema."""
+        if not self.automation_config.session_id:
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.automation_config.session_id = (
+                f"{self.automation_config.device_name}_wafer_automation_{ts}"
+            )
+
+        manifest = {
+            "project_id": self.automation_config.project_id,
+            "wafer_id": self.automation_config.wafer_id,
+            "device_id": self.automation_config.device_id or self.automation_config.device_name,
+            "session_id": self.automation_config.session_id,
+            "parent_session_id": self.automation_config.parent_session_id,
+            "protocol_name": self.automation_config.protocol_name,
+            "protocol_version": self.automation_config.protocol_version,
+            "schema_version": self.automation_config.schema_version,
+            "operator": self.automation_config.operator,
+            "timestamp_start_utc": datetime.fromtimestamp(run_start_ts, UTC).isoformat().replace("+00:00", "Z"),
+            "timestamp_end_utc": datetime.fromtimestamp(run_end_ts, UTC).isoformat().replace("+00:00", "Z"),
+            "total_sites_requested": total_sites,
+            "total_sites_measured": len(self.site_summaries),
+            "stage_connected": bool(self.stage.connected),
+            "b1500_connected": bool(self.b1500.connected),
+            "power_meter_connected": bool(self.power_meter.connected),
+            "scan_mode": self.automation_config.scan_mode,
+            "map_rows": self.automation_config.map_rows,
+            "map_cols": self.automation_config.map_cols,
+            "x_step_um": self.automation_config.x_step_um,
+            "y_step_um": self.automation_config.y_step_um,
+            "rollover_enabled": bool(self.sweep_config.enable_rollover),
+            "rollover_method": self.sweep_config.rollover_method,
+            "rollover_threshold": self.sweep_config.rollover_threshold,
+            "run_status": "error" if run_error else ("stopped" if self.stop_requested else "completed"),
+            "error_message": run_error,
+            "output_files": {
+                "summary": summary_path,
+                "site_csv_count": len(self.site_summaries),
+                "site_csv_paths": [s.csv_path for s in self.site_summaries],
+            },
+        }
+
+        path = output_dir / "session_manifest.json"
+        path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        return str(path)
+
     def _write_spectrometer_hook(
         self,
         output_dir: Path,
@@ -373,6 +427,9 @@ class WaferAutomationEngine:
         self.running = True
         self.stop_requested = False
         self.site_summaries = []
+        run_start_ts = time.time()
+        run_error = ""
+        summary_path = ""
 
         output_dir = Path(self.automation_config.output_folder)
         if not output_dir.is_absolute():
@@ -583,6 +640,7 @@ class WaferAutomationEngine:
             self.log(f"Summary saved to {summary_path}")
 
         except Exception as exc:
+            run_error = str(exc)
             self.log(f"Automation error: {exc}")
             if self.stage.connected:
                 try:
@@ -591,6 +649,18 @@ class WaferAutomationEngine:
                 except Exception:
                     pass
         finally:
+            try:
+                manifest_path = self._save_session_manifest(
+                    output_dir=output_dir,
+                    run_start_ts=run_start_ts,
+                    run_end_ts=time.time(),
+                    total_sites=total_sites,
+                    summary_path=summary_path,
+                    run_error=run_error,
+                )
+                self.log(f"Session manifest saved to {manifest_path}")
+            except Exception as manifest_exc:
+                self.log(f"WARNING: Failed to write session manifest: {manifest_exc}")
             self.running = False
 
         return self.site_summaries

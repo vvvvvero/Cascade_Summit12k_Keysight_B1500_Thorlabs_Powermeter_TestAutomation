@@ -132,6 +132,7 @@ Each site produces:
   `voltage_V`, `current_A`, `power_W`
 - A summary row in `summary.csv` with peak current, peak power,
   rollover flag, and stop reason
+- A run-level `session_manifest.json` with VGZ-VRLS Series V1 metadata
 
 ---
 

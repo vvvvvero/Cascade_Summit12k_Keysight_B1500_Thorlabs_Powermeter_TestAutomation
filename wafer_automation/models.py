@@ -59,6 +59,17 @@ class AutomationConfig:
     output_folder: str = "wafer_automation_results"
     device_name: str = "WaferDevice"
 
+    # Series metadata (VGZ-VRLS schema alignment)
+    project_id: str = "VGZ-VRLS"
+    wafer_id: str = ""
+    device_id: str = "WaferDevice"
+    session_id: str = ""
+    parent_session_id: str = ""
+    operator: str = ""
+    protocol_name: str = "wafer_mapping_rollover"
+    protocol_version: str = "1.0.0"
+    schema_version: str = "series-v1"
+
 
 @dataclass
 class SiteSummary:
